@@ -9,7 +9,15 @@ const LogOutButton = () => {
         <button
             type="submit"
             onClick={() => {
-                logout
-            }}
+                logout();
+                navigate("/", {
+                    replace: true,
+                });
+            }}>
+                {isLoading ? "logging out..." : "Logout"}
+            </button>
         </>
     )
+
+}
+export default LogOutButton;
