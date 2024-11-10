@@ -57,33 +57,50 @@ export const authBlogApi = createApi({
 export const { useLoginMutation, useLogoutMutation, useRegisterMutation } = authBlogApi;
 
 const authSlice = createSlice({
-    name: "auth",
-    initialState: {
-        user: null,
-        token: null,
-    } as AuthState,
-    reducers: {},
-    extraReducers(builder) {
-        builder.addMatcher(
-            authBlogApi.endpoints.login.matchFulfilled,
-            (state, {payload }) => {
-                state.token = payload.token;
-                state.user = {
-                    id: payload.userid,
-                    username: payload.username,
-                    email: payload.email,
-                    role: payload.role
-                };
-                return state;
-            },
-        );
-        builder.addMatcher(authBlogApi.endpoints.logout.matchFulfiled, (state) => {
-            state.token = null;
-            state.user = null;
-            return state;
-        });
-    },
-});
-
+	name: 'auth',
+	initialState,
+	reducers: {
+	  refreshAuthentication: (state) => {
+		const isAuthenticated = sessionStorage.getItem('isAuthenticated');
+		if (isAuthenticated === 'true') {
+		  const userSession = sessionStorage.getItem('user');
+		  const response: UserResponse = JSON.parse(userSession as string);
+		  state.token = response.token;
+		  state.user = {
+			username: response.username,
+			id: response.userId,
+			email: response.email,
+			role: response.role,
+		  };
+		}
+		return state;
+	  },
+	},
+extraReducers(builder) {
+	builder.addMatcher(
+			authBlogApi.endpoints.login.matchFulfilled,
+			(state, { payload }) => {
+					state.token = payload.token;
+					state.user = {
+							id: payload.userId,
+							username: payload.username,
+							email: payload.email,
+							role: payload.role,
+					};
+					sessionStorage.setItem("isAuthenticated", "true");
+					sessionStorage.setItem("user", `${JSON.stringify(payload)}`);
+					return state;
+			},
+	);
+	builder.addMatcher(authBlogApi.endpoints.logout.matchFulfilled, (state) => {
+			state.token = null;
+			state.user = null;
+			sessionStorage.removeItem("isAuthenticated");
+			sessionStorage.removeItem("user");
+			return state;
+	});
+},
+export const { refreshAuthentication } = authSlice.actions;
 export default authSlice.reducer;
+
 

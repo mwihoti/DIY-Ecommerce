@@ -30,8 +30,8 @@ const EditPost = ({ isAuthenticated }: { isAuthenticated: boolean }) => {
             </>
             );
             
-        const [updatePost, {isLoading }] = useUpdatePostMutation();
-        const {isLoading, dataLoading, data: posts } = useGetBlogPostsByUsernameQuery(
+        const [updatePost, { isLoading }] = useUpdatePostMutation();
+        const { isLoading: dataLoading, data: posts } = useGetBlogPostsByUsernameQuery(
             query.username as string,
         );
 
